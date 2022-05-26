@@ -1,0 +1,81 @@
+<resources>
+    <string name="app_name">Go4Lunch</string>
+
+    <!-- Used in Navigation View -->
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- Login Activity -->
+    <string name="connection_succeed">Successful authentication</string>
+    <string name="error_authentication_canceled">Authentication canceled</string>
+    <string name="error_no_internet">No internet connection</string>
+    <string name="error_unknown_error">Unknown error</string>
+    <string name="info_no_email_found">No email address found</string>
+
+
+    <string name="activity_main_title">Go4Lunch</string>
+    <string name="activity_main_subtitle">Find a nice restaurant and invite your co-workers for lunch!</string>
+
+
+    <!-- Toolbar -->
+    <string name="toolbar_title">"I'm Hungry!"</string>
+    <string name="toolbar_workmates_title">"Available Workmates"</string>
+    <string name="toolbar_lunch_title">@string/menu_lunch</string>
+    <string name="toolbar_settings_title">@string/menu_settings</string>
+    <string name="toolbar_logout_title">@string/menu_logout</string>
+
+    <!-- NavigationDrawer -->
+    <string name="menu_lunch">YOUR LUNCH</string>
+    <string name="menu_settings">SETTINGS</string>
+    <string name="menu_logout">LOGOUT</string>
+
+    <!-- Bottom Navigation View -->
+    <string name="bottom_navigation_view_map_view">Map View</string>
+    <string name="bottom_navigation_view_list_view">List View</string>
+    <string name="bottom_navigation_view_workmates">Workmates</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="map_fragment">Hello map fragment</string>
+    <string name="list_fragment">Hello list fragment</string>
+    <string name="workmates_fragment">Hello workmates fragment</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- Login labels -->
+    <string name="login_email_signIn">Sign in with Email</string>
+    <string name="login_google_signIn">Sign in with Google</string>
+    <string name="login_facebook_signIn">Sign in with Facebook</string>
+    <string name="login_twitter_signIn">Sign in with Twitter</string>
+    <string name="app_logo" translatable="false">App Logo</string>
+
+    <string name="title_map_view">Map View</string>
+    <string name="title_list_view">List View</string>
+    <string name="title_workmates">Workmates</string>
+    <string name="info_no_username_found">No username found</string>
+
+    <!-- Register labels -->
+    <string name="register_username">Firstname Lastname</string>
+    <string name="register_email">Email</string>
+    <string name="register_password">Password</string>
+    <string name="register_button">Register</string>
+    <string name="title_activity_login2">LoginActivity2</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
+
+    <string name="facebook_application_id">1067185104143828</string>
+    <string name="fb_login_protocol_scheme">fb1067185104143828</string>
+
+    <string name="location_permission_denied">Location permissions denied,
+        please enable the permissions to use this app.
+    </string>
+</resources>

@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".controllers.activities.RestaurantDetailsActivity">
+
+    <ImageView
+        android:id="@+id/restaurant_details_image"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@color/go4LunchBackgroundColor"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/restaurant_details_constraint_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/orange"
+        app:layout_constraintStart_toStartOf="parent"
+        android:padding="16dp"
+        app:layout_constraintTop_toBottomOf="@id/restaurant_details_image">
+
+        <TextView
+            android:id="@+id/restaurant_details_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="32sp"
+            tools:text="Le Zinc"
+            android:textColor="@color/white"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/restaurant_details_constraint_layout"/>
+        <TextView
+            android:id="@+id/restaurant_details_address"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="French restaurant - 12 rue du Faubourg Poissonnière"
+            android:textColor="@color/white"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/restaurant_details_name"/>
+
+
+        <ImageView
+            android:id="@+id/restaurant_details_star1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_star"
+            android:layout_marginStart="16dp"
+            app:layout_constraintBottom_toBottomOf="@id/restaurant_details_name"
+            app:layout_constraintTop_toTopOf="@id/restaurant_details_name"
+            app:layout_constraintStart_toEndOf="@id/restaurant_details_name"/>
+        <ImageView
+            android:id="@+id/restaurant_details_star2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_star"
+            app:layout_constraintBottom_toBottomOf="@id/restaurant_details_name"
+            app:layout_constraintTop_toTopOf="@id/restaurant_details_name"
+            app:layout_constraintStart_toEndOf="@id/restaurant_details_star1"/>
+        <ImageView
+            android:id="@+id/restaurant_details_star3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_star"
+            app:layout_constraintBottom_toBottomOf="@id/restaurant_details_name"
+            app:layout_constraintTop_toTopOf="@id/restaurant_details_name"
+            app:layout_constraintStart_toEndOf="@id/restaurant_details_star2"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/floating_action_button_choice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintTop_toBottomOf="@id/restaurant_details_image"
+        app:layout_constraintBottom_toTopOf="@id/restaurant_details_constraint_layout"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/icons_constraint_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/restaurant_details_constraint_layout">
+
+        <ImageView
+            android:id="@+id/restaurant_details_call"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_call_orange"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/icons_constraint_layout"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="64dp"/>
+        <ImageView
+            android:id="@+id/restaurant_details_like"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_star_orange"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/icons_constraint_layout"/>
+        <ImageView
+            android:id="@+id/restaurant_details_website"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_website_orange"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toTopOf="@id/icons_constraint_layout"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="64dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/orange"
+            android:textStyle="bold"
+            tools:text="CALL"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/restaurant_details_call"
+            app:layout_constraintStart_toStartOf="@id/restaurant_details_call"
+            app:layout_constraintEnd_toEndOf="@id/restaurant_details_call"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/orange"
+            android:textStyle="bold"
+            tools:text="LIKE"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/restaurant_details_like"
+            app:layout_constraintStart_toStartOf="@id/restaurant_details_like"
+            app:layout_constraintEnd_toEndOf="@id/restaurant_details_like"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/orange"
+            android:textStyle="bold"
+            tools:text="WEBSITE"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/restaurant_details_website"
+            app:layout_constraintStart_toStartOf="@id/restaurant_details_website"
+            app:layout_constraintEnd_toEndOf="@id/restaurant_details_website"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/restaurant_details_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/icons_constraint_layout"
+        android:layout_marginTop="32dp"
+        tools:listitem="@layout/fragment_workmate_item"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

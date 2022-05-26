@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_margin="2dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/restaurant_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        tools:text="Mac Donald's"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="16dp"/>
+    <TextView
+        android:id="@+id/restaurant_address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="American - 9 Av. du président Allende"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="@id/restaurant_name"
+        app:layout_constraintTop_toBottomOf="@id/restaurant_name"/>
+    <TextView
+        android:id="@+id/restaurant_opening_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="Open until 7pm"
+        android:textStyle="italic"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="@id/restaurant_name"
+        app:layout_constraintTop_toBottomOf="@id/restaurant_address"/>
+
+    <ImageView
+        android:id="@+id/restaurant_imageview"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@drawable/ic_lunch"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/restaurant_name"
+        android:layout_marginEnd="2dp"
+        app:layout_constraintBottom_toBottomOf="@id/restaurant_opening_time"/>
+    <TextView
+        android:id="@+id/restaurant_distance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="120m"
+        app:layout_constraintTop_toTopOf="@id/restaurant_name"
+        app:layout_constraintEnd_toStartOf="@id/restaurant_imageview"
+        android:layout_marginEnd="8dp"/>
+    <ImageView
+        android:id="@+id/restaurant_image_workmates"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:src="@drawable/ic_person"
+        app:layout_constraintEnd_toStartOf="@id/restaurant_imageview"
+        app:layout_constraintBottom_toBottomOf="@id/restaurant_address"
+        android:layout_marginEnd="24dp"/>
+    <TextView
+        android:id="@+id/restaurant_number_of_workmates"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="(3)"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toStartOf="@id/restaurant_imageview"
+        app:layout_constraintBottom_toBottomOf="@id/restaurant_image_workmates"/>
+    <ImageView
+        android:id="@+id/restaurant_star_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_star"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toStartOf="@id/restaurant_imageview"
+        app:layout_constraintBottom_toBottomOf="@id/restaurant_imageview"/>
+    <ImageView
+        android:id="@+id/restaurant_star_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_star"
+        app:layout_constraintEnd_toStartOf="@id/restaurant_star_1"
+        app:layout_constraintBottom_toBottomOf="@id/restaurant_imageview"/>
+    <ImageView
+        android:id="@+id/restaurant_star_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_star"
+        app:layout_constraintEnd_toStartOf="@id/restaurant_star_2"
+        app:layout_constraintBottom_toBottomOf="@id/restaurant_imageview"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>
