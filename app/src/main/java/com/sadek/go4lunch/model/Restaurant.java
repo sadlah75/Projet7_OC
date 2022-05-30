@@ -18,7 +18,7 @@ public class Restaurant implements Serializable {
     private double longitude;
     private String imageUrl;
     private int numberOfWorkmates;
-    private double rating;
+    private double rating = 0.0;
     private String openingTime;
     private String phone;
     private String website;
@@ -87,7 +87,7 @@ public class Restaurant implements Serializable {
     }
 
     public void setRating(double rating) {
-        this.rating = rating;
+            this.rating = rating;
     }
 
     public String getOpeningTime() {
@@ -144,7 +144,9 @@ public class Restaurant implements Serializable {
     }
 
     public void addDataFromNearByPlacesDetails(@NonNull NearByPlacesDetails.Result result) {
-        //this.setRating(result.getRating());
+        if (result.getRating() != null) {
+            this.setRating(result.getRating());
+        }
         this.setPhone(result.getFormattedPhoneNumber());
         this.setWebsite(result.getWebsite());
     }
