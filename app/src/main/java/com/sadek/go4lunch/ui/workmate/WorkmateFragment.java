@@ -66,7 +66,7 @@ public class WorkmateFragment extends Fragment {
     private void initRecyclerView() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         binding.listWorkmatesRecyclerview.setLayoutManager(layoutManager);
-        WorkmateAdapter lAdapter = new WorkmateAdapter(mWorkmates);
+        WorkmateAdapter lAdapter = new WorkmateAdapter(mWorkmates,"eating");
         // Set CustomAdapter as the adapter for RecyclerView.
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(binding.listWorkmatesRecyclerview.getContext(),
                 layoutManager.getOrientation());

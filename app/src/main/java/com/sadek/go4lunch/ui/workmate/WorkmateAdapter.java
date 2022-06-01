@@ -21,9 +21,12 @@ import java.util.List;
 public class WorkmateAdapter extends RecyclerView.Adapter<WorkmateAdapter.ViewHolder> {
 
     private List<Workmate> mWorkmates;
+    private String result;
 
-    public WorkmateAdapter(List<Workmate> workmates) {
+
+    public WorkmateAdapter(List<Workmate> workmates, String result) {
         this.mWorkmates = workmates;
+        this.result = result;
     }
 
     @NonNull
@@ -41,8 +44,14 @@ public class WorkmateAdapter extends RecyclerView.Adapter<WorkmateAdapter.ViewHo
         if(workmate.getChosenRestaurant() == null) {
             holder.getDescription().setText(String.format("%s has not decided yet",workmate.getUsername()));
         }else {
-            holder.getDescription().setText(String.format("%s is eating %s",
-                    workmate.getUsername(),workmate.getChosenRestaurant().getName()));
+            if(result.equals("eating")) {
+                holder.getDescription().setText(String.format("%s is eating (%s)",
+                        workmate.getUsername(),workmate.getChosenRestaurant()));
+            }else {
+                holder.getDescription().setText(String.format("%s is joining!",
+                        workmate.getUsername(),workmate.getChosenRestaurant()));
+            }
+
         }
         if(workmate.getUrlImage() != null) {
             Glide.with(holder.getPhoto().getContext())

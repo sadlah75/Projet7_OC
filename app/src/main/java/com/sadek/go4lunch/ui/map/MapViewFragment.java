@@ -94,11 +94,8 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     public MapViewFragment() {
     }
 
-
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentMapViewBinding.inflate(inflater, container, false);
-        Log.i("TAG", "OnCreateView");
-        getCurrentLocation();
         return binding.getRoot();
     }
 
@@ -106,13 +103,12 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         // Construct a FusedLocationProviderClient.
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
+        populateMapWithMarkers();
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //getCurrentLocation();
         setHasOptionsMenu(true);
         if (savedInstanceState != null) {
             currentLocation = savedInstanceState.getParcelable(KEY_LOCATION);
@@ -120,6 +116,8 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         }
         // Construct a FusedLocationProviderClient.
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
+        getCurrentLocation();
+
     }
 
     @Override
@@ -129,6 +127,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
             outState.putParcelable(KEY_LOCATION, currentLocation);
         }
         super.onSaveInstanceState(outState);
+
     }
 
     private void getCurrentLocation() {
@@ -145,7 +144,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
             public void onSuccess(Location location) {
                 if (location != null) {
                     currentLocation = location;
-
 
                     RestaurantFragment.setLocation(currentLocation.getLatitude(), currentLocation.getLongitude());
                     //Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -235,7 +233,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
                 .subscribeWith(new DisposableObserver<NearByPlacesDetails>() {
                     @Override
                     public void onNext(NearByPlacesDetails nearByPlacesDetails) {
-                        Log.i("restaurant","restaurant name: " + restaurant.getName());
                         restaurant.addDataFromNearByPlacesDetails(nearByPlacesDetails.getResult());
                         RestaurantHelper.createRestaurant(restaurant);
                     }
@@ -247,55 +244,13 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     }
 
 
-    private void populateMapWithMarkers(@NonNull List<Restaurant> restaurants) {
-        //Bitmap bitmap = BitmapFactory.decodeResource(getContext().getResources(),R.drawable.ic_marker_no_select);
-        for (Restaurant restaurant : restaurants) {
-            Task<DocumentSnapshot> document = RestaurantHelper.getRestaurantByPlaceId(restaurant.getPlaceId());
-
-
-
+    private void populateMapWithMarkers() {
+        for (Restaurant restaurant : mRestaurants) {
             Marker marker = mMap.addMarker(new MarkerOptions()
-            .position(new LatLng(restaurant.getLatitude(), restaurant.getLongitude()))
-            .title(restaurant.getName()));
-
-            /*
-            1. On récupère l'ensemble des workmates stockés dans Firebase
-            2. On parcourt chacun des workmates (document) et vérifie si un restaurant a été choisi
-             (si différent de null)
-            3. Puis on met à jour le marker en vert
-
-            WorkmateHelper.getAllWorkmates().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                    if (task.isSuccessful()) {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            Workmate workmate = document.toObject(Workmate.class);
-                            if(workmate.getChosenRestaurant() != null) {
-                                if(workmate.getChosenRestaurant().getName().equals(restaurant.getName())) {
-                                    marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                                }
-                            }
-
-                        }
-                    }
-                }
-            });*/
-
-
-            /*
-            RestaurantHelper.getAllRestaurants().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                    if(task.isSuccessful()) {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            Restaurant restaurant = document.toObject(Restaurant.class);
-                            if(restaurant.getNumberOfWorkmates() > 0) {
-                                marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                            }
-                        }
-                    }
-                }
-            });*/
+            .position(new LatLng(restaurant.getLatitude(), restaurant.getLongitude())));
+            if(restaurant.getNumberOfWorkmates() > 0) {
+                marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+            }
         }
     }
 
@@ -313,6 +268,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         for(Restaurant restaurant : mRestaurants) {
             executeRetrofitWithDetails(restaurant);
         }
+        populateMapWithMarkers();
     }
 
 

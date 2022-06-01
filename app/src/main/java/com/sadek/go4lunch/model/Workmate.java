@@ -8,13 +8,13 @@ public class Workmate implements Serializable {
     private String username;
     private String email;
     private String urlImage;
-    private Restaurant chosenRestaurant;
+    private String chosenRestaurant;
     private List<Restaurant> likedRestaurant;
     private boolean notificationsEnabled;
 
     public Workmate(){}
 
-    public Workmate(String id, String username, String email, String urlImage, Restaurant chosenRestaurant, List<Restaurant> likedRestaurant, boolean notificationsEnabled) {
+    public Workmate(String id, String username, String email, String urlImage, String chosenRestaurant, List<Restaurant> likedRestaurant, boolean notificationsEnabled) {
         this.id = id;
         this.username = username;
         this.email = email;
@@ -61,11 +61,11 @@ public class Workmate implements Serializable {
         this.urlImage = urlImage;
     }
 
-    public Restaurant getChosenRestaurant() {
+    public String getChosenRestaurant() {
         return chosenRestaurant;
     }
 
-    public void setChosenRestaurant(Restaurant chosenRestaurant) {
+    public void setChosenRestaurant(String chosenRestaurant) {
         this.chosenRestaurant = chosenRestaurant;
     }
 
