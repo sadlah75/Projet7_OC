@@ -86,6 +86,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
 
     private Location currentLocation;
     private List<Restaurant> mRestaurants = new ArrayList<>();
+    private List<Restaurant> mRestaurantsFromFirebase = new ArrayList<>();
 
 
     private FragmentMapViewBinding binding;
@@ -117,7 +118,24 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         // Construct a FusedLocationProviderClient.
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
         getCurrentLocation();
+        getAllRestaurantsFromFirebase();
+    }
 
+    private void getAllRestaurantsFromFirebase() {
+        RestaurantHelper.getAllRestaurants().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful()) {
+                    List<DocumentSnapshot> result = task.getResult().getDocuments();
+                    if(!result.isEmpty()) {
+                        for (DocumentSnapshot documentSnapshot : result) {
+                            Restaurant restaurant = documentSnapshot.toObject(Restaurant.class);
+                            mRestaurantsFromFirebase.add(restaurant);
+                        }
+                    }
+                }
+            }
+        });
     }
 
     @Override
@@ -233,8 +251,16 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
                 .subscribeWith(new DisposableObserver<NearByPlacesDetails>() {
                     @Override
                     public void onNext(NearByPlacesDetails nearByPlacesDetails) {
+                        boolean isExist = false;
                         restaurant.addDataFromNearByPlacesDetails(nearByPlacesDetails.getResult());
-                        RestaurantHelper.createRestaurant(restaurant);
+                        for (Restaurant restaurantFromFirebase : mRestaurantsFromFirebase) {
+                            if(isExist = restaurant.getPlaceId().equals(restaurantFromFirebase.getPlaceId()))
+                                break;
+                        }
+                        if (!isExist) {
+                            RestaurantHelper.createRestaurant(restaurant);
+                        }
+
                     }
                     @Override
                     public void onError(Throwable e) {}

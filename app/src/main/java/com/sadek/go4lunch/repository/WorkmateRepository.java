@@ -19,9 +19,11 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.model.Document;
 import com.sadek.go4lunch.model.Workmate;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class WorkmateRepository {
 
@@ -76,15 +78,38 @@ public class WorkmateRepository {
             String uid = user.getUid();
             String email = user.getEmail();
 
+            getWorkmatesCollection().get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    if(task.isSuccessful()) {
+                        boolean isExist = false;
+                        if(!task.getResult().getDocuments().isEmpty()) {
+                            for (DocumentSnapshot document : task.getResult().getDocuments()) {
+                                if(isExist = document.getId().equals(uid))
+                                    break;
+                            }
+                        }
+                        Log.i("isExist","value: " + isExist);
+
+                        if(!isExist) {
+                            Workmate workmateToCreate = new Workmate(uid,username,email,urlPhoto,null,null,false);
+                            getWorkmatesCollection().document(uid).set(workmateToCreate);
+                        }
+                    }
+                }
+            });
+
+            /*
             Workmate workmateToCreate = new Workmate(uid,username,email,urlPhoto,null,null,false);
             Task<DocumentSnapshot> userData = this.getWorkmateData();
             // If the user already exist in Firestore, we get his data
             userData.addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                 @Override
                 public void onSuccess(DocumentSnapshot documentSnapshot) {
-                    getWorkmatesCollection().document(uid).set(workmateToCreate);
+                        getWorkmatesCollection().document(uid).set(workmateToCreate);
+
                 }
-            });
+            });*/
         }
     }
 
