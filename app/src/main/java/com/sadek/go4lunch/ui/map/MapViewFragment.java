@@ -3,10 +3,6 @@ package com.sadek.go4lunch.ui.map;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,12 +12,10 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -30,7 +24,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
@@ -39,12 +32,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.sadek.go4lunch.BuildConfig;
 import com.sadek.go4lunch.R;
@@ -53,11 +41,9 @@ import com.sadek.go4lunch.databinding.FragmentMapViewBinding;
 import com.sadek.go4lunch.model.NearByPlace;
 import com.sadek.go4lunch.model.NearByPlacesDetails;
 import com.sadek.go4lunch.model.Restaurant;
-import com.sadek.go4lunch.model.Workmate;
 import com.sadek.go4lunch.ui.list.RestaurantFragment;
 import com.sadek.go4lunch.utils.RestaurantAPIStream;
 import com.sadek.go4lunch.utils.RestaurantHelper;
-import com.sadek.go4lunch.utils.WorkmateHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,7 +71,9 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     private final LatLng defaultLocation = new LatLng(48.856614, 2.3522219);
 
     private Location currentLocation;
-    private List<Restaurant> mRestaurants = new ArrayList<>();
+    private List<Restaurant> mRestaurantsWithRetrofit = new ArrayList<>();
+    private List<Restaurant> mRestaurantsFromFirebase = new ArrayList<>();
+
 
 
     private FragmentMapViewBinding binding;
@@ -102,22 +90,37 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         // Construct a FusedLocationProviderClient.
-        populateMapWithMarkers();
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
+        getCurrentLocation();
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        if (savedInstanceState != null) {
-            currentLocation = savedInstanceState.getParcelable(KEY_LOCATION);
-            cameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
-        }
-        // Construct a FusedLocationProviderClient.
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
-        getCurrentLocation();
+    }
 
+
+    private void getAllRestaurantsFromFirebase() {
+        RestaurantHelper.getAllRestaurants().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful()) {
+                    List<DocumentSnapshot> llist = task.getResult().getDocuments();
+                    if(!llist.isEmpty()) {
+                        for (DocumentSnapshot documentSnapshot : llist) {
+                            Restaurant restaurant = documentSnapshot.toObject(Restaurant.class);
+                            mRestaurantsFromFirebase.add(restaurant);
+                        }
+                        populateMapWithMarkers();
+                    }else {
+                        populateRestaurantsWithRetrofit();
+                    }
+                }
+            }
+        });
     }
 
     @Override
@@ -151,7 +154,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
                     assert supportMapFragment != null;
                     supportMapFragment.getMapAsync(MapViewFragment.this);
 
-                    //recupérer les restos
+                    getAllRestaurantsFromFirebase();
                 }
             }
         });
@@ -197,11 +200,9 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,DEFAULT_ZOOM));
 
-        updateMapWithRestaurants();
-
     }
 
-    private void updateMapWithRestaurants() {
+    private void populateRestaurantsWithRetrofit() {
         executeHttpRequestWithRetrofit();
     }
 
@@ -210,12 +211,13 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         String location = currentLocation.getLatitude() + "," + currentLocation.getLongitude();
         Log.i("location","location: " + location);
         String key = BuildConfig.GOOGLE_API_KEY;
+        Log.i("tag","I'm here");
 
-        Disposable disposable = RestaurantAPIStream.streamFetchNearByPlace(location,type,1000,key)
+        Disposable disposable = RestaurantAPIStream.streamFetchNearByPlace(location,type,500,key)
                 .subscribeWith(new DisposableObserver<NearByPlace>() {
                     @Override
                     public void onNext(NearByPlace nearByPlace) {
-                        mRestaurants = populateListOfRestaurants(nearByPlace.getResults());
+                        mRestaurantsWithRetrofit = populateListOfRestaurants(nearByPlace.getResults());
                         populateListOfRestaurantsWithDetails();
                     }
                     @Override
@@ -233,8 +235,10 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
                 .subscribeWith(new DisposableObserver<NearByPlacesDetails>() {
                     @Override
                     public void onNext(NearByPlacesDetails nearByPlacesDetails) {
+                        boolean isExist = false;
                         restaurant.addDataFromNearByPlacesDetails(nearByPlacesDetails.getResult());
                         RestaurantHelper.createRestaurant(restaurant);
+
                     }
                     @Override
                     public void onError(Throwable e) {}
@@ -243,16 +247,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
                 });
     }
 
-
-    private void populateMapWithMarkers() {
-        for (Restaurant restaurant : mRestaurants) {
-            Marker marker = mMap.addMarker(new MarkerOptions()
-            .position(new LatLng(restaurant.getLatitude(), restaurant.getLongitude())));
-            if(restaurant.getNumberOfWorkmates() > 0) {
-                marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-            }
-        }
-    }
 
     @NonNull
     private List<Restaurant> populateListOfRestaurants(@NonNull List<NearByPlace.Result> results) {
@@ -265,12 +259,23 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void populateListOfRestaurantsWithDetails() {
-        for(Restaurant restaurant : mRestaurants) {
+        for(Restaurant restaurant : mRestaurantsWithRetrofit) {
             executeRetrofitWithDetails(restaurant);
+            mRestaurantsFromFirebase.add(restaurant);
         }
         populateMapWithMarkers();
     }
 
+
+    private void populateMapWithMarkers() {
+        for (Restaurant restaurant : mRestaurantsFromFirebase) {
+            Marker marker = mMap.addMarker(new MarkerOptions()
+            .position(new LatLng(restaurant.getLatitude(), restaurant.getLongitude())));
+            if(restaurant.getNumberOfWorkmates() > 0) {
+                marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+            }
+        }
+    }
 
 
     GoogleMap.OnMarkerClickListener onMarkerClickListener = new GoogleMap.OnMarkerClickListener() {
@@ -278,7 +283,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         public boolean onMarkerClick(Marker marker) {
             LatLng currentMarker = marker.getPosition();
             // Do something with the marker
-            for (Restaurant restaurant : mRestaurants) {
+            for (Restaurant restaurant : mRestaurantsFromFirebase) {
                 if (currentMarker.equals(new LatLng(restaurant.getLatitude(),restaurant.getLongitude()))) {
                     Intent intent = new Intent(getActivity(), RestaurantDetailsActivity.class);
                     intent.putExtra("restaurant",restaurant);

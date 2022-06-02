@@ -2,15 +2,11 @@ package com.sadek.go4lunch.repository;
 
 import android.content.Context;
 import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
 import com.firebase.ui.auth.AuthUI;
-import com.google.android.gms.auth.account.WorkAccount;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -20,7 +16,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.sadek.go4lunch.model.Workmate;
-
 import java.util.ArrayList;
 
 public class WorkmateRepository {
@@ -76,13 +71,24 @@ public class WorkmateRepository {
             String uid = user.getUid();
             String email = user.getEmail();
 
-            Workmate workmateToCreate = new Workmate(uid,username,email,urlPhoto,null,null,false);
-            Task<DocumentSnapshot> userData = this.getWorkmateData();
-            // If the user already exist in Firestore, we get his data
-            userData.addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            getWorkmatesCollection().get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                 @Override
-                public void onSuccess(DocumentSnapshot documentSnapshot) {
-                    getWorkmatesCollection().document(uid).set(workmateToCreate);
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    if(task.isSuccessful()) {
+                        boolean isExist = false;
+                        if(!task.getResult().getDocuments().isEmpty()) {
+                            for (DocumentSnapshot document : task.getResult().getDocuments()) {
+                                if(isExist = document.getId().equals(uid))
+                                    break;
+                            }
+                        }
+                        Log.i("isExist","value: " + isExist);
+
+                        if(!isExist) {
+                            Workmate workmateToCreate = new Workmate(uid,username,email,urlPhoto,null,null,false);
+                            getWorkmatesCollection().document(uid).set(workmateToCreate);
+                        }
+                    }
                 }
             });
         }

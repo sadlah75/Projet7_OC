@@ -18,12 +18,15 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.sadek.go4lunch.databinding.FragmentWorkmatesListBinding;
+import com.sadek.go4lunch.model.Restaurant;
 import com.sadek.go4lunch.model.Workmate;
+import com.sadek.go4lunch.utils.RestaurantHelper;
 import com.sadek.go4lunch.utils.WorkmateHelper;
 
 import java.util.ArrayList;
@@ -41,7 +44,6 @@ public class WorkmateFragment extends Fragment {
         displayWorkmatesList();
         return binding.getRoot();
     }
-
 
     private void displayWorkmatesList() {
         WorkmateHelper.getAllWorkmates().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {

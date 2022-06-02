@@ -38,4 +38,8 @@ public class RestaurantHelper {
         return getRestaurantsCollection().document(uid).update
                 ("numberOfWorkmates", number);
     }
+
+    public static Task<Void> updateOpenTime(String uid, String result) {
+        return getRestaurantsCollection().document(uid).update("openingTime",result);
+    }
 }

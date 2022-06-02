@@ -18,6 +18,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -31,6 +32,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.sadek.go4lunch.R;
 import com.sadek.go4lunch.databinding.ActivityHomeBinding;
 import com.sadek.go4lunch.manager.UserManager;
+import com.sadek.go4lunch.ui.lunch.YourLunchFragment;
 import com.sadek.go4lunch.ui.workmate.WorkmateViewModel;
 
 public class HomeActivity extends BaseActivity<ActivityHomeBinding> {
@@ -88,12 +90,13 @@ public class HomeActivity extends BaseActivity<ActivityHomeBinding> {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_map_view, R.id.nav_list_view, R.id.nav_workmates)
+                R.id.nav_map_view, R.id.nav_list_view, R.id.nav_workmates,R.id.nav_lunch)
                 .setOpenableLayout(binding.drawerLayout)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(binding.navBottomView,navController);
+        NavigationUI.setupWithNavController(binding.navView,navController);
     }
 
     @Override
@@ -125,4 +128,14 @@ public class HomeActivity extends BaseActivity<ActivityHomeBinding> {
             }
         });
     }
+
+    /*
+    public void onClickLunch(MenuItem item) {
+        binding.drawerLayout.closeDrawer(GravityCompat.START);
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        YourLunchFragment fragment = new YourLunchFragment();
+        fragmentTransaction.replace(R.id.nav_host_fragment_content_main,fragment);
+        fragmentTransaction.commit();
+    }*/
+
 }

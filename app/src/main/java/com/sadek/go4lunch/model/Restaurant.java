@@ -135,6 +135,16 @@ public class Restaurant implements Serializable {
         restaurant.setLatitude(result.getGeometry().getLocation().getLat());
         restaurant.setLongitude(result.getGeometry().getLocation().getLng());
 
+        if(result.getOpeningHours() != null) {
+            Log.i("time","result: " + result.getOpeningHours().getOpenNow());
+            if(result.getOpeningHours().getOpenNow()) {
+                restaurant.setOpeningTime("Open");
+            }else {
+                restaurant.setOpeningTime("Close");
+            }
+        }
+
+
         if(result.getPhotos() != null) {
             restaurant.setImageUrl(photoBase + result.getPhotos().get(0).getPhotoReference()
             + "&key=" + BuildConfig.GOOGLE_API_KEY);

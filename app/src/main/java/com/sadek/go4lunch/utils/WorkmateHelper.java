@@ -3,6 +3,8 @@ package com.sadek.go4lunch.utils;
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
@@ -14,6 +16,12 @@ import com.sadek.go4lunch.model.Workmate;
 public class WorkmateHelper {
 
     private static final String COLLECTION_PATH = "workmates";
+
+
+    public static FirebaseUser getCurrentWorkmate() {
+        return FirebaseAuth.getInstance().getCurrentUser();
+    }
+
 
     // Get collection reference ("workmates")
     @NonNull

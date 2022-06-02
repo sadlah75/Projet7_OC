@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.sadek.go4lunch.BuildConfig;
@@ -32,8 +33,10 @@ import com.sadek.go4lunch.databinding.FragmentRestaurantListBinding;
 import com.sadek.go4lunch.model.NearByPlace;
 import com.sadek.go4lunch.model.NearByPlacesDetails;
 import com.sadek.go4lunch.model.Restaurant;
+import com.sadek.go4lunch.model.Workmate;
 import com.sadek.go4lunch.utils.RestaurantAPIStream;
 import com.sadek.go4lunch.utils.RestaurantHelper;
+import com.sadek.go4lunch.utils.WorkmateHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +52,7 @@ public class RestaurantFragment extends Fragment implements RestaurantAdapter.On
 
     // Declare list of Restaurants & adapter
     private List<Restaurant> mRestaurants = new ArrayList<>();
+    private List<Workmate> mWorkmates = new ArrayList<>();
     private RestaurantAdapter mAdapter;
 
     // Declare Location's latitude & longitude
@@ -61,10 +65,30 @@ public class RestaurantFragment extends Fragment implements RestaurantAdapter.On
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentRestaurantListBinding.inflate(inflater, container, false);
-        configureRecyclerView();
-        populateListOfRestaurants();
         return binding.getRoot();
     }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        getAllWorkmatesFromFirestore();
+        populateListOfRestaurants();
+    }
+
+    private void getAllWorkmatesFromFirestore() {
+        WorkmateHelper.getAllWorkmates().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful()) {
+                    for (DocumentSnapshot document : task.getResult()) {
+                        Workmate workmate = document.toObject(Workmate.class);
+                        mWorkmates.add(workmate);
+                    }
+                }
+            }
+        });
+    }
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -91,7 +115,8 @@ public class RestaurantFragment extends Fragment implements RestaurantAdapter.On
                         restaurant.setDistance(setupDistance(restaurant));
                         mRestaurants.add(restaurant);
                     }
-                    binding.listRestaurantRecyclerview.getAdapter().notifyDataSetChanged();
+                    configureRecyclerView();
+                    //binding.listRestaurantRecyclerview.getAdapter().notifyDataSetChanged();
                 }
             }
         });
@@ -150,48 +175,4 @@ public class RestaurantFragment extends Fragment implements RestaurantAdapter.On
         currentLat = latitude;
         currentLong = longitude;
     }
-
-
-
-
-
-    // Execute HTTP request to retrieve restaurants & RxJava
-    /*private void executeHttpRequestWithRetrofit() {
-        String type = "restaurant";
-        String location = currentLat + "," + currentLong;
-        String key = BuildConfig.GOOGLE_API_KEY;
-        int radius = 1000;
-        this.mDisposable = RestaurantAPIStream.streamFetchNearByPlace(location,type,radius,key)
-                .subscribeWith(new DisposableObserver<NearByPlace>() {
-                    @Override
-                    public void onNext(NearByPlace nearByPlace) {
-                        populateListOfRestaurants(nearByPlace.getResults());
-                    }
-                    @Override
-                    public void onError(Throwable e) { }
-                    @Override
-                    public void onComplete() { }
-                });
-    }
-
-    private void executeHttpRequestFromDetails(Restaurant restaurant) {
-        String key = BuildConfig.GOOGLE_API_KEY;
-        String placeId = restaurant.getPlaceId();
-
-        this.mDisposable = RestaurantAPIStream.streamFetchNearByPlaceDetails(key,placeId)
-                .subscribeWith(new DisposableObserver<NearByPlacesDetails>() {
-                    @Override
-                    public void onNext(NearByPlacesDetails nearByPlacesDetails) {
-                        restaurant.addDataFromNearByPlacesDetails(nearByPlacesDetails.getResult());
-                        mAdapter.notifyDataSetChanged();
-
-                    }
-                    @Override
-                    public void onError(Throwable e) {}
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
-    }*/
 }

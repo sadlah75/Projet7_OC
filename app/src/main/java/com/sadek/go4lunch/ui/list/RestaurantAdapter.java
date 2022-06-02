@@ -1,5 +1,7 @@
 package com.sadek.go4lunch.ui.list;
 
+import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -52,6 +54,12 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.Vi
         holder.getName().setText(restaurant.getName());
         holder.getAddress().setText(restaurant.getAddress());
         holder.getNumberOfWorkmates().setText("(" +restaurant.getNumberOfWorkmates()+")");
+
+
+        if(restaurant.getOpeningTime() != null && restaurant.getOpeningTime().equals("Close")) {
+            holder.getOpeningTime().setTextColor(Color.RED);
+        }
+        holder.getOpeningTime().setText(restaurant.getOpeningTime());
 
         if(restaurant.getImageUrl() != null) {
             Glide.with(holder.getImageUrl().getContext())
