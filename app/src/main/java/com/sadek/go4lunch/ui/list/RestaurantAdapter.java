@@ -48,8 +48,6 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.Vi
     public void onBindViewHolder(@NonNull RestaurantAdapter.ViewHolder holder, int position) {
 
         Restaurant restaurant = mRestaurants.get(position);
-        Log.i("result","Restaurant: Name->" + restaurant.getName() + ",  Rating->" +
-                restaurant.getRating());
 
         holder.getName().setText(restaurant.getName());
         holder.getAddress().setText(restaurant.getAddress());

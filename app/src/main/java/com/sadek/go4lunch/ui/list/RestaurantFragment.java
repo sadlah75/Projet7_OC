@@ -89,7 +89,6 @@ public class RestaurantFragment extends Fragment implements RestaurantAdapter.On
         });
     }
 
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -116,7 +115,6 @@ public class RestaurantFragment extends Fragment implements RestaurantAdapter.On
                         mRestaurants.add(restaurant);
                     }
                     configureRecyclerView();
-                    //binding.listRestaurantRecyclerview.getAdapter().notifyDataSetChanged();
                 }
             }
         });

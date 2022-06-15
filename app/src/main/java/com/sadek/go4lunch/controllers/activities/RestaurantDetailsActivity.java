@@ -30,9 +30,12 @@ import java.util.List;
 
 public class RestaurantDetailsActivity extends BaseActivity<ActivityRestaurantDetailsBinding> {
 
-    private Restaurant mRestaurant;
+    private Restaurant mCurrentRestaurant;
+    private Restaurant mOldRestaurant;
     private List<Workmate> mWorkmates = new ArrayList<>();
-    String chosenRestaurantCurrentUser;
+    private String chosenRestaurantCurrentUser;
+    private String uid;
+    private int numberOfWorkmates;
     private Restaurant mRestaurantFromFirestore;
 
     @Override
@@ -44,37 +47,64 @@ public class RestaurantDetailsActivity extends BaseActivity<ActivityRestaurantDe
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setupIntent();
-        init();
+        uid = WorkmateHelper.getCurrentWorkmate().getUid();
 
+        setupIntent();
         setupListenerCall();
         setupListenerWebsite();
-        setupListenerChosenRestaurant();
-        configureRecyclerView();
+        getRestaurantFromFirestore();
+
+        getChosenRestaurantCurrentUser();
         updateUIWithWorkmates();
+        configureRecyclerView();
     }
 
-    private void init() {
+    // 1. Je récupère le nom du restaurant anciennement choisie
+    // 2. J'appelle la méthode chargée de récupérer le restaurant correspondant
+    private void getChosenRestaurantCurrentUser() {
         String uid = WorkmateHelper.getCurrentWorkmate().getUid();
         WorkmateHelper.getWorkmateByUID(uid).addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     Workmate workmate = task.getResult().toObject(Workmate.class);
-                    chosenRestaurantCurrentUser = workmate.getChosenRestaurant();
+                   // chosenRestaurantCurrentUser = workmate.getChosenRestaurant();
+                    getOldRestaurantCurrentUser();
                 }
             }
         });
+    }
 
-        RestaurantHelper.getRestaurantByPlaceId(mRestaurant.getPlaceId())
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+    // 1. je récupère le restaurant dont le nom correspond au choix de l'utilisateur
+    private void getOldRestaurantCurrentUser() {
+        RestaurantHelper.getAllRestaurants().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-                    mRestaurantFromFirestore = task.getResult().toObject(Restaurant.class);
+                    for(QueryDocumentSnapshot document : task.getResult()) {
+                        Restaurant restaurant = document.toObject(Restaurant.class);
+                        if(restaurant.getName().equals(chosenRestaurantCurrentUser)) {
+                            mOldRestaurant = restaurant;
+                            break;
+                        }
+                    }
+                    setupListenerChosenRestaurant();
                 }
             }
         });
+    }
+
+    private void getRestaurantFromFirestore() {
+        RestaurantHelper.getRestaurantByPlaceId(mCurrentRestaurant.getPlaceId())
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            mRestaurantFromFirestore = task.getResult().toObject(Restaurant.class);
+                            numberOfWorkmates = mRestaurantFromFirestore.getNumberOfWorkmates();
+                        }
+                    }
+                });
     }
 
     private void updateUIWithWorkmates() {
@@ -84,7 +114,7 @@ public class RestaurantDetailsActivity extends BaseActivity<ActivityRestaurantDe
                 if(task.isSuccessful()) {
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         Workmate workmate = document.toObject(Workmate.class);
-                        if(mRestaurant.getName().equals(workmate.getChosenRestaurant())) {
+                        if(mCurrentRestaurant.getName().equals(workmate.getChosenRestaurant())) {
                             mWorkmates.add(workmate);
                         }
                     }
@@ -99,29 +129,42 @@ public class RestaurantDetailsActivity extends BaseActivity<ActivityRestaurantDe
         binding.floatingActionButtonChoice.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String uid = WorkmateHelper.getCurrentWorkmate().getUid();
-                if(!mRestaurant.getName().equals(chosenRestaurantCurrentUser)) {
-                    WorkmateHelper.addChosenRestaurant(uid,mRestaurant.getName());
-                    int number = mRestaurantFromFirestore.getNumberOfWorkmates() + 1;
-                    RestaurantHelper.updateNumberOfWorkmates(mRestaurant.getPlaceId(),number);
+                getRestaurantFromFirestore();
+                getOldRestaurantCurrentUser();
+
+                //Si le nom du restaurant choisi est différent du restaurant selectionné
+                if(!mCurrentRestaurant.getName().equals(chosenRestaurantCurrentUser)) {
+                    //si l'tuilisateur n'as pas chosi de restaurant
+                    if(chosenRestaurantCurrentUser != null) {
+                        int nb = mOldRestaurant.getNumberOfWorkmates();
+                        RestaurantHelper.updateNumberOfWorkmates(mOldRestaurant.getPlaceId(),nb-1);
+                    }
+                        numberOfWorkmates++;
+
+                        WorkmateHelper.addChosenRestaurant(uid, mCurrentRestaurant.getName());
+                        chosenRestaurantCurrentUser = mCurrentRestaurant.getName();
+
+                // si identique
                 }else {
-                    WorkmateHelper.addChosenRestaurant(uid,"");
-                    int number = mRestaurantFromFirestore.getNumberOfWorkmates() - 1;
-                    RestaurantHelper.updateNumberOfWorkmates(mRestaurant.getPlaceId(),number);
+                    numberOfWorkmates--;
+                    WorkmateHelper.addChosenRestaurant(uid,null);
                 }
+
+                RestaurantHelper.updateNumberOfWorkmates(mCurrentRestaurant.getPlaceId(),numberOfWorkmates);
                 mWorkmates.clear();
                 updateUIWithWorkmates();
             }
         });
     }
+    //----------------------------------------------------------------------------------------
 
     // Setup Listener website button
     private void setupListenerWebsite() {
         binding.restaurantDetailsWebsite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(mRestaurant.getWebsite() != null) {
-                    Intent website = new Intent(Intent.ACTION_VIEW,Uri.parse(mRestaurant.getWebsite()));
+                if(mCurrentRestaurant.getWebsite() != null) {
+                    Intent website = new Intent(Intent.ACTION_VIEW,Uri.parse(mCurrentRestaurant.getWebsite()));
                     startActivity(website);
                 }else {
                     binding.restaurantDetailsWebsite.setEnabled(false);
@@ -135,9 +178,9 @@ public class RestaurantDetailsActivity extends BaseActivity<ActivityRestaurantDe
         binding.restaurantDetailsCall.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(mRestaurant.getPhone() != null) {
+                if(mCurrentRestaurant.getPhone() != null) {
                     Intent call = new Intent(Intent.ACTION_DIAL);
-                    call.setData(Uri.parse("tel:" + mRestaurant.getPhone()));
+                    call.setData(Uri.parse("tel:" + mCurrentRestaurant.getPhone()));
                     startActivity(call);
                 }else {
                     binding.restaurantDetailsCall.setEnabled(false);
@@ -149,21 +192,21 @@ public class RestaurantDetailsActivity extends BaseActivity<ActivityRestaurantDe
     private void setupIntent() {
         Intent intent = getIntent();
 
-        mRestaurant = (Restaurant) intent.getSerializableExtra("restaurant");
+        mCurrentRestaurant = (Restaurant) intent.getSerializableExtra("restaurant");
 
-        binding.restaurantDetailsName.setText(mRestaurant.getName());
-        binding.restaurantDetailsAddress.setText(mRestaurant.getAddress());
+        binding.restaurantDetailsName.setText(mCurrentRestaurant.getName());
+        binding.restaurantDetailsAddress.setText(mCurrentRestaurant.getAddress());
         Glide.with(this)
-                .load(mRestaurant.getImageUrl())
+                .load(mCurrentRestaurant.getImageUrl())
                 .apply(RequestOptions.centerCropTransform())
                 .into(binding.restaurantDetailsImage);
 
         // Display stars depending on restaurant's rating
-        if (mRestaurant.getRating() < 4.0)
+        if (mCurrentRestaurant.getRating() < 4.0)
             binding.restaurantDetailsStar3.setVisibility(View.GONE);
-        else if (mRestaurant.getRating() < 3.0)
+        else if (mCurrentRestaurant.getRating() < 3.0)
             binding.restaurantDetailsStar2.setVisibility(View.GONE);
-        else if (mRestaurant.getRating() < 2.0)
+        else if (mCurrentRestaurant.getRating() < 2.0)
             binding.restaurantDetailsStar1.setVisibility(View.GONE);
     }
 
@@ -179,5 +222,9 @@ public class RestaurantDetailsActivity extends BaseActivity<ActivityRestaurantDe
         binding.restaurantDetailsRecyclerView.setAdapter(lAdapter);
     }
 
-
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
 }

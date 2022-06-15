@@ -2,12 +2,15 @@ package com.sadek.go4lunch.utils;
 
 import androidx.annotation.NonNull;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.sadek.go4lunch.model.Restaurant;
+
+import java.util.List;
 
 public class RestaurantHelper {
 
@@ -41,5 +44,9 @@ public class RestaurantHelper {
 
     public static Task<Void> updateOpenTime(String uid, String result) {
         return getRestaurantsCollection().document(uid).update("openingTime",result);
+    }
+
+    public static void deleteAllRestaurants() {
+
     }
 }

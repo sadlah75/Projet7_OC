@@ -1,14 +1,12 @@
 package com.sadek.go4lunch.controllers.activities;
 
-import android.Manifest;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -18,8 +16,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -27,19 +23,19 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseUser;
 import com.sadek.go4lunch.R;
 import com.sadek.go4lunch.databinding.ActivityHomeBinding;
 import com.sadek.go4lunch.manager.UserManager;
-import com.sadek.go4lunch.ui.lunch.YourLunchFragment;
-import com.sadek.go4lunch.ui.workmate.WorkmateViewModel;
+import com.sadek.go4lunch.utils.DeleteAllRestaurantsReceiver;
+import com.sadek.go4lunch.utils.DeleteChosenRestaurantReceiver;
+
+import java.util.Calendar;
 
 public class HomeActivity extends BaseActivity<ActivityHomeBinding> {
 
     private AppBarConfiguration mAppBarConfiguration;
     private UserManager userManager = UserManager.getInstance();
-    private WorkmateViewModel mWorkmateViewModel;
 
     private static final int REQUEST_LOCATION_PERMISSION = 1;
     private View view;
@@ -57,6 +53,7 @@ public class HomeActivity extends BaseActivity<ActivityHomeBinding> {
         setSupportActionBar(binding.appBarMain.toolbar);
         initBottomNavigationView();
         updateUIWithUserData();
+        setDeleteAlarmManager();
     }
 
     private void updateUIWithUserData() {
@@ -120,22 +117,32 @@ public class HomeActivity extends BaseActivity<ActivityHomeBinding> {
         ActivityCompat.startActivity(context,intent,null);
     }
 
+    // Method to disconnect from his session
     public void onClickLogout(MenuItem item) {
-        userManager.signOut(this).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void unused) {
-                LoginActivity.navigate(HomeActivity.this);
-            }
-        });
+        userManager.signOut(this).addOnSuccessListener(unused -> LoginActivity.navigate(HomeActivity.this));
     }
 
-    /*
-    public void onClickLunch(MenuItem item) {
-        binding.drawerLayout.closeDrawer(GravityCompat.START);
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        YourLunchFragment fragment = new YourLunchFragment();
-        fragmentTransaction.replace(R.id.nav_host_fragment_content_main,fragment);
-        fragmentTransaction.commit();
-    }*/
+    // Method to delete all restaurants chosen everyday at 5:00 p.m
+    private void setDeleteAlarmManager() {
+        Calendar calendar1 = Calendar.getInstance();
+        calendar1.setTimeInMillis(System.currentTimeMillis());
+
+        Calendar calendar2 = Calendar.getInstance();
+        calendar2.set(Calendar.HOUR_OF_DAY,12);
+        calendar2.set(Calendar.MINUTE,29);
+
+
+
+        Intent intent = new Intent(HomeActivity.this, DeleteAllRestaurantsReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this,
+                1,intent,PendingIntent.FLAG_UPDATE_CURRENT);
+
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        if(alarmManager != null) {
+            alarmManager.setRepeating(AlarmManager.RTC,calendar2.getTimeInMillis(),
+                    AlarmManager.INTERVAL_DAY,pendingIntent);
+        }
+    }
+
 
 }
