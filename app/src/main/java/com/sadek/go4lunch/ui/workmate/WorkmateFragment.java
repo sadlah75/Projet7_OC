@@ -35,7 +35,7 @@ public class WorkmateFragment extends Fragment {
 
     private FragmentWorkmatesListBinding binding;
     private ArrayList<Workmate> mWorkmates = new ArrayList<>();
-    private WorkmateViewModel mWorkmateViewModel;
+
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {

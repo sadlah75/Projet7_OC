@@ -23,6 +23,7 @@ import com.sadek.go4lunch.model.Restaurant;
 import com.sadek.go4lunch.model.Workmate;
 import com.sadek.go4lunch.ui.workmate.WorkmateAdapter;
 import com.sadek.go4lunch.utils.RestaurantHelper;
+import com.sadek.go4lunch.utils.SharedPreferencesHelper;
 import com.sadek.go4lunch.utils.WorkmateHelper;
 
 import java.util.ArrayList;
@@ -149,6 +150,10 @@ public class RestaurantDetailsActivity extends BaseActivity<ActivityRestaurantDe
                     numberOfWorkmates--;
                     WorkmateHelper.addChosenRestaurant(uid,null);
                 }
+
+
+                SharedPreferencesHelper.setData(RestaurantDetailsActivity.this,mCurrentRestaurant.getName(),
+                        mCurrentRestaurant.getAddress());
 
                 RestaurantHelper.updateNumberOfWorkmates(mCurrentRestaurant.getPlaceId(),numberOfWorkmates);
                 mWorkmates.clear();

@@ -1,5 +1,6 @@
 package com.sadek.go4lunch.ui.lunch;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,8 +15,10 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.sadek.go4lunch.controllers.activities.RestaurantDetailsActivity;
 import com.sadek.go4lunch.databinding.FragmentYourLunchBinding;
 import com.sadek.go4lunch.model.Workmate;
+import com.sadek.go4lunch.utils.SharedPreferencesHelper;
 import com.sadek.go4lunch.utils.WorkmateHelper;
 
 public class YourLunchFragment extends Fragment {
@@ -36,16 +39,14 @@ public class YourLunchFragment extends Fragment {
     }
 
     private void setLunch() {
-        String uid = WorkmateHelper.getCurrentWorkmate().getUid();
-        WorkmateHelper.getWorkmateByUID(uid).addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    Workmate workmate = task.getResult().toObject(Workmate.class);
-                    binding.textLunch.setText(workmate.getChosenRestaurant());
-                }
-            }
-        });
+        String name = SharedPreferencesHelper.getRestaurantName(getActivity());
+        String address = SharedPreferencesHelper.getRestaurantAddress(getActivity());
+        if(name != null && address !=  null) {
+            binding.textLunch.setText(name);
+            binding.subTextLunch.setText(address);
+        }else {
+            binding.textLunch.setText("Aucune Sélection");
+        }
     }
 
     @Override

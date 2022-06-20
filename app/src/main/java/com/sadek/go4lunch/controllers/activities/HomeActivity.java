@@ -11,7 +11,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -27,8 +26,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.sadek.go4lunch.R;
 import com.sadek.go4lunch.databinding.ActivityHomeBinding;
 import com.sadek.go4lunch.manager.UserManager;
-import com.sadek.go4lunch.utils.DeleteAllRestaurantsReceiver;
-import com.sadek.go4lunch.utils.DeleteChosenRestaurantReceiver;
+import com.sadek.go4lunch.utils.DeleteAlarmReceiver;
+import com.sadek.go4lunch.utils.NotificationReceiver;
 
 import java.util.Calendar;
 
@@ -48,12 +47,12 @@ public class HomeActivity extends BaseActivity<ActivityHomeBinding> {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //initViewModel();
         view = binding.navView.getHeaderView(0);
         setSupportActionBar(binding.appBarMain.toolbar);
         initBottomNavigationView();
         updateUIWithUserData();
-        setDeleteAlarmManager();
+        //setDeleteAlarmManager();
+        setNotificationAlarmManager();
     }
 
     private void updateUIWithUserData() {
@@ -122,27 +121,39 @@ public class HomeActivity extends BaseActivity<ActivityHomeBinding> {
         userManager.signOut(this).addOnSuccessListener(unused -> LoginActivity.navigate(HomeActivity.this));
     }
 
-    // Method to delete all restaurants chosen everyday at 5:00 p.m
+    // Method to delete all restaurants and restaurants chosen by the workmates at 5:00 p.m
     private void setDeleteAlarmManager() {
-        Calendar calendar1 = Calendar.getInstance();
-        calendar1.setTimeInMillis(System.currentTimeMillis());
-
-        Calendar calendar2 = Calendar.getInstance();
-        calendar2.set(Calendar.HOUR_OF_DAY,12);
-        calendar2.set(Calendar.MINUTE,29);
-
+        Calendar current = Calendar.getInstance();
+        current.setTimeInMillis(System.currentTimeMillis());
+        Calendar start = Calendar.getInstance();
+        start.setTimeInMillis(System.currentTimeMillis());
+        start.set(Calendar.HOUR_OF_DAY,17);
 
 
-        Intent intent = new Intent(HomeActivity.this, DeleteAllRestaurantsReceiver.class);
+        Intent intent = new Intent(this, DeleteAlarmReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this,
                 1,intent,PendingIntent.FLAG_UPDATE_CURRENT);
-
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        if(alarmManager != null) {
-            alarmManager.setRepeating(AlarmManager.RTC,calendar2.getTimeInMillis(),
-                    AlarmManager.INTERVAL_DAY,pendingIntent);
+
+        if (alarmManager != null) {
+           alarmManager.setExact(AlarmManager.RTC_WAKEUP, start.getTimeInMillis(),
+                        pendingIntent);
         }
     }
 
+    private void setNotificationAlarmManager() {
+        Calendar start = Calendar.getInstance();
+        start.setTimeInMillis(System.currentTimeMillis());
+        start.set(Calendar.HOUR_OF_DAY,19);
+        start.set(Calendar.MINUTE,36);
 
+        Intent intent = new Intent(this, NotificationReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this,
+                2,intent,PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        if (alarmManager != null) {
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, start.getTimeInMillis(),
+                    pendingIntent);
+        }
+    }
 }

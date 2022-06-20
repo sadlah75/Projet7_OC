@@ -2,10 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.sadek.go4lunch">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.CALL_PHONE"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
     <application
         android:name=".Go4LunchApplication"
@@ -16,6 +17,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Go4Lunch">
         <activity
+            android:name=".controllers.activities.NotificationActivity"
+            android:exported="false" />
+        <activity
             android:name=".controllers.activities.RestaurantDetailsActivity"
             android:exported="false" />
         <activity
@@ -24,23 +28,23 @@
         <activity
             android:name=".controllers.activities.LoginActivity"
             android:exported="true"
-            android:label="@string/app_name"
             android:theme="@style/Theme.Go4Lunch.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyA_YyKXKc_yf1gJ6fJzmxoAT-rmGY9NkFA"/>
+            android:value="AIzaSyA_YyKXKc_yf1gJ6fJzmxoAT-rmGY9NkFA" />
 
-        <receiver android:name=".utils.DeleteChosenRestaurantReceiver"
+        <receiver
+            android:name=".utils.DeleteAlarmReceiver"
             android:enabled="true"
-            android:exported="true"/>
-        <receiver android:name=".utils.DeleteAllRestaurantsReceiver"
+            android:exported="true" />
+        <receiver android:name=".utils.NotificationReceiver"
             android:enabled="true"
             android:exported="true"/>
     </application>
