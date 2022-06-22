@@ -144,8 +144,8 @@ public class HomeActivity extends BaseActivity<ActivityHomeBinding> {
     private void setNotificationAlarmManager() {
         Calendar start = Calendar.getInstance();
         start.setTimeInMillis(System.currentTimeMillis());
-        start.set(Calendar.HOUR_OF_DAY,19);
-        start.set(Calendar.MINUTE,36);
+        start.set(Calendar.HOUR_OF_DAY,12);
+        start.set(Calendar.MINUTE,25);
 
         Intent intent = new Intent(this, NotificationReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this,
